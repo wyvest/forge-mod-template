@@ -50,6 +50,7 @@ shadowJar {
     exclude('modcore.jar')
 
     classifier = "working"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 reobf {
@@ -65,7 +66,7 @@ sourceSets {
 }
 
 jar {
-    DuplicatesStrategy.EXCLUDE
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 processResources
