@@ -3,7 +3,7 @@ package net.wyvest.mod.utils;
 import ga.matthewtgm.json.objects.JsonObject;
 import ga.matthewtgm.json.parsing.JsonParser;
 import net.wyvest.mod.Constants;
-import net.wyvest.mod.ExampleMod;
+import net.wyvest.nod.WyfoldMod;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,15 +19,11 @@ public class VersionChecker {
 
     public String verJson;
     public JsonObject verOBJ;
-    private String versFileUrl = "ADD VERSION JSON HERE";
-    private String version;
-    private String download_url;
-    private boolean emergency;
-    private BufferedReader reader;
 
     {
         try {
-            reader = new BufferedReader(new InputStreamReader(new URL(versFileUrl).openStream()));
+            String versFileUrl = "JSON FILE HERE";
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(versFileUrl).openStream()));
             verJson = reader.readLine();
             verOBJ = JsonParser.parseObj(verJson);
         } catch (IOException e) {
@@ -38,24 +34,13 @@ public class VersionChecker {
     public String getVersion() {
         try {
             JsonObject obj = JsonParser.parseObj(verJson);
-            version = String.valueOf(obj.get("latest"));
-            return version;
+            return String.valueOf(obj.get("latest"));
         } catch (Exception e) {
             e.printStackTrace();
             return "";
         }
     }
 
-    public String getDownloadURL() {
-        try {
-            JsonObject obj = JsonParser.parseObj(verJson);
-            download_url = String.valueOf(obj.get("download_url"));
-            return download_url;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
 
     public boolean getEmergencyStatus() {
 
@@ -63,7 +48,8 @@ public class VersionChecker {
 
             JsonObject obj = JsonParser.parseObj(verJson);
 
-            if (ExampleMod.getInstance().isNull(obj.get("emergency_update_" + Constants.VER)))
+            boolean emergency;
+            if (WyfoldMod.getInstance().isNull(obj.get("emergency_update_" + Constants.VER)))
                 emergency = false;
             else emergency = (boolean) obj.get("emergency_update_" + Constants.VER);
 
@@ -78,14 +64,5 @@ public class VersionChecker {
 
     }
 
-    public void reload() {
-        try {
-            reader = new BufferedReader(new InputStreamReader(new URL(versFileUrl).openStream()));
-            verJson = reader.readLine();
-            verOBJ = JsonParser.parseObj(verJson);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 }
