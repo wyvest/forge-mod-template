@@ -2,6 +2,7 @@ package net.wyvest.mod;
 
 import club.sk1er.modcore.ModCoreInstaller;
 import club.sk1er.mods.core.gui.notification.Notifications;
+import kotlin.Unit;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -9,25 +10,25 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.wyvest.mod.utils.VersionChecker;
 
-@Mod(name = Constants.NAME, version = Constants.VER, modid = Constants.ID)
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+
+@Mod(name = ExampleMod.MOD_NAME, version = ExampleMod.VERSION, modid = ExampleMod.MOD_ID)
 public class ExampleMod {
 
-    @Mod.Instance(Constants.ID)
-    private static ExampleMod INSTANCE;
-    public VersionChecker VERSION_CHECKER = new VersionChecker();
-    private boolean latestVersion;
+    @Mod.Instance(MOD_ID)
+    public static ExampleMod INSTANCE;
 
-    public static ExampleMod getInstance() {
-        if (INSTANCE == null)
-            INSTANCE = new ExampleMod();
-        return INSTANCE;
-    }
+    public static final String MOD_ID = "examplemod";
+    public static final String MOD_NAME = "Example Mod";
+    public static final String VERSION = "1.0";
+
 
     @Mod.EventHandler
     protected void onPreInit(FMLPreInitializationEvent event) {
-        if (this.VERSION_CHECKER.getEmergencyStatus())
-            throw new RuntimeException("PLEASE UPDATE TO THE NEW VERSION OF " + Constants.NAME + "\nTHIS IS AN EMERGENCY!");
-        this.latestVersion = this.VERSION_CHECKER.getVersion().equals(Constants.VER);
+        VersionChecker.getVersion();
     }
 
     @Mod.EventHandler
@@ -38,14 +39,28 @@ public class ExampleMod {
 
     @Mod.EventHandler
     protected void onPostInit(FMLPostInitializationEvent event) {
-        if (!isLatestVersion()) {
-            Notifications.INSTANCE.pushNotification(Constants.NAME, Constants.NAME + " is out of date. Please update to the latest version.");
+        if (Double.parseDouble(VersionChecker.version) > Double.parseDouble(VERSION)) {
+            Notifications.INSTANCE.pushNotification(MOD_NAME, MOD_NAME + " is out of date. Please update to the latest version.", this::browseDownloadPage);
         }
     }
-    public boolean isNull(Object obj) {
-        return obj == null;
+
+    private Unit browseDownloadPage() {
+        try {
+            Desktop.getDesktop().browse(this.URLtoURI(new URL("https://wyvest.net/example")));
+            return Unit.INSTANCE;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
-    public boolean isLatestVersion() {
-        return latestVersion;
+
+    private URI URLtoURI(URL url) {
+        try {
+            return url.toURI();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

@@ -1,68 +1,45 @@
 package net.wyvest.mod.utils;
 
-import ga.matthewtgm.json.objects.JsonObject;
-import ga.matthewtgm.json.parsing.JsonParser;
-import net.wyvest.mod.Constants;
-import net.wyvest.nod.WyfoldMod;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-
 /*/
-    By MatthewTGM
-    Will not work unless versFileUrl is defined to a valid json
+    ty pinkulu <3
  */
 
+import club.sk1er.mods.core.util.Multithreading;
+import com.google.gson.Gson;
+import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+
 public class VersionChecker {
+    public static String version;
+    public static String info;
 
-    public String verJson;
-    public JsonObject verOBJ;
+    public static void getVersion() {
+        OkHttpClient client = new OkHttpClient();
+        Multithreading.runAsync(() -> {
+            Request request = new Request.Builder()
+                    .url("https://wyvest.net/example.json")
+                    .build();
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    e.printStackTrace();
+                }
 
-    {
-        try {
-            String versFileUrl = "JSON FILE HERE";
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(versFileUrl).openStream()));
-            verJson = reader.readLine();
-            verOBJ = JsonParser.parseObj(verJson);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    if (response.isSuccessful()) {
+                        assert response.body() != null;
+                        String myRespones = response.body().string();
+                        if (!myRespones.contains("error")) {
+                            JsonResponse Jresponse = new Gson().fromJson(myRespones, JsonResponse.class);
+                            version = Jresponse.version;
+                            info = Jresponse.info;
+                        }
+                    }
+                }
+            });
+        });
     }
-
-    public String getVersion() {
-        try {
-            JsonObject obj = JsonParser.parseObj(verJson);
-            return String.valueOf(obj.get("latest"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
-
-    public boolean getEmergencyStatus() {
-
-        try {
-
-            JsonObject obj = JsonParser.parseObj(verJson);
-
-            boolean emergency;
-            if (WyfoldMod.getInstance().isNull(obj.get("emergency_update_" + Constants.VER)))
-                emergency = false;
-            else emergency = (boolean) obj.get("emergency_update_" + Constants.VER);
-
-            return emergency;
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return false;
-
-        }
-
-    }
-
-
 }
