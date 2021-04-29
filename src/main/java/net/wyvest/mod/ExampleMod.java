@@ -18,13 +18,12 @@ import java.net.URL;
 @Mod(name = ExampleMod.MOD_NAME, version = ExampleMod.VERSION, modid = ExampleMod.MOD_ID)
 public class ExampleMod {
 
-    @Mod.Instance(MOD_ID)
-    public static ExampleMod INSTANCE;
-
     public static final String MOD_ID = "examplemod";
     public static final String MOD_NAME = "Example Mod";
     public static final String VERSION = "1.0";
 
+    @Mod.Instance(MOD_ID)
+    public static ExampleMod INSTANCE;
 
     @Mod.EventHandler
     protected void onPreInit(FMLPreInitializationEvent event) {
